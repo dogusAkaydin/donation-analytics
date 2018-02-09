@@ -37,7 +37,7 @@ def main(recFilePath,pctFilePath,outFilePath):
                 if donorID in donors:
                     repeatDonations.setdefault(groupID,[]).append(int(amt))
                     #repeatDonations[groupID].append(int(amt))
-                    emitPercentileValues(repeatDonations,percentile,outFile)
+                    emitStats(repeatDonations,percentile,outFile)
                 else:
                     donors[donorID] = set()
                 donors[donorID].add(year)
@@ -62,11 +62,11 @@ def getColumnIDs(selectedColumns):
                      for aColumn in selectedColumns]
     return dict(zip(selectedColumns,selectedNumbers))
 
-def findPercentileDonation(sortedList,percentile,n):
+def findPercentileValue(sortedList,percentile,n):
     idx=math.ceil((percentile/100.0)*n)-1 #-1 since the list is 0-based.
     return sortedList[idx]
 
-def emitPercentileValues(donations,percentile,outFile):
+def emitStats(donations,percentile,outFile):
     for groupID, amounts in donations.items():
         #This list is sorted except for the last appended item.
         donations[groupID].sort()
@@ -80,7 +80,7 @@ def emitPercentileValues(donations,percentile,outFile):
         Merge Sort or Insertion Sort.
         '''
         outFile.write('{}|{}|{}|{}\n'.format(groupID,
-                                      findPercentileDonation(sl,percentile,n),
+                                      findPercentileValue(sl,percentile,n),
                                       suml,n))
     return True
 
