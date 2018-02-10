@@ -1,4 +1,3 @@
-"""Compute running percentile of repeat donors in a list streaming line-by-line."""
 import sys
 import csv
 from collections import defaultdict, namedtuple
