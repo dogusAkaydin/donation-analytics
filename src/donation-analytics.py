@@ -1,8 +1,9 @@
 import sys
 import csv
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 import math
 import argparse
+import datetime
 
 def main(recFilePath,pctFilePath,outFilePath,logFilePath,logVerbose,modAccount):
     with open(pctFilePath, 'r') as pctFile, \
@@ -111,22 +112,24 @@ def emitStats(donations,percentile,outFile):
 def getRecord(record,lineNumber,selectedColumns,colID,
               nAllColumns,logFile,logVerbose=False):
     Record = namedtuple('Record', 'lineNumber length otherID name ' 
-                                  'zipCode year recipient amount')
+                                  'fullZipCode date recipient amount')
     theRecord = Record(lineNumber = lineNumber,
                        length     = len(record),
                        otherID    = record[colID['OTHER_ID']],
                        name       = record[colID['NAME']],
-                       zipCode    = record[colID['ZIP_CODE']][0:5],
-                       year       = record[colID['TRANSACTION_DT']][4:],
+                       fullZipCode= record[colID['ZIP_CODE']],
+                       date       = record[colID['TRANSACTION_DT']],
                        recipient  = record[colID['CMTE_ID']],
                        amount     = record[colID['TRANSACTION_AMT']])
  
     if isValid(nAllColumns,theRecord,logFile,logVerbose):
-        donorID = theRecord.name+'|'+theRecord.zipCode
-        groupID = theRecord.recipient+'|'+theRecord.zipCode+'|'+theRecord.year
+        zipCode=theRecord.fullZipCode[0:5]
+        year=theRecord.date[4:8]
+        donorID = theRecord.name+'|'+zipCode
+        groupID = theRecord.recipient+'|'+zipCode+'|'+year
         result = namedtuple('ValidRecord', 
                             ['donorID', 'groupID', 'amount', 'year'])
-        return result(donorID,groupID,theRecord.amount,theRecord.year)
+        return result(donorID,groupID,theRecord.amount,year)
 
 def isValid(nAllColumns,Record,logFile,logVerbose=False):
 
@@ -145,20 +148,45 @@ def isValid(nAllColumns,Record,logFile,logVerbose=False):
                    'because "OTHER_ID" field is not empty.\n') \
                   .format(lineNumber)
             logFile.write(msg)
-    #Doing only a loose check on names on purpose.
-    #If an aggressive check is needed a validator package can be used.
     elif (Record.name is None or Record.name.isspace()):
-        print('in')
+        #Doing only a loose check on names on purpose.
+        #If an aggressive check is needed a validator package can be used.
         if logVerbose:
-            msg = ('Skipping line {:d} because "NAME" field is blank. \n') \
+            msg = ('Skipping line {:d}' 
+                   'because "NAME" field is blank. \n') \
                   .format(lineNumber)
             logFile.write(msg)
-    elif any((Record.zipCode, Record.year, 
-              Record.recipient, Record.amount)) in (None, ''):
+    elif (len(Record.fullZipCode) < 5 
+          or not Record.fullZipCode[0:5].isdecimal()): 
+        #This will let in an entry like "94040-FOOBAR", which I thought is OK.
+        if logVerbose:
+            msg = ('Skipping line {:d}' 
+                   'because "ZIP_CODE" field is malformed. \n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    elif (not isinstance(datetime.datetime.strptime(Record.date, '%m%d%Y'), 
+                         datetime.date)):
+        if logVerbose:
+            msg = ('Skipping line {:d}' 
+                   'because "TRANSACTION_DT" field is malformed. \n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    elif (Record.amount is None 
+          or Record.amount.isspace()
+          or not isNumber(Record.amount)
+          or int(Record.amount)<=0): # 0-contribution is no contribution.
+        #Doing only a loose check on names on purpose.
+        #If an aggressive check is needed a validator package can be used.
+        if logVerbose:
+            msg = ('Skipping line {:d}' 
+                   'because "TRANSACTIO_AMT" field is malformed' 
+                                                     'or non-positive. \n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    elif Record.recipient is None or Record.recipient.isspace():
         if logVerbose:
             msg = ('Skipping line {:d}'
-                    'because a requested field is empty' 
-                    'or it does not exist.\n') \
+                   'because CMTE_ID field is missing or empty \n') \
                   .format(lineNumber)
             logFile.write(msg)
     else:
@@ -166,13 +194,20 @@ def isValid(nAllColumns,Record,logFile,logVerbose=False):
 
     return result
 
+def isNumber(s):
+    try:
+        res=float(s)
+        return False if res is float('NaN') else True
+    except ValueError:
+        return False
+
 if __name__ == '__main__':
     '''
     Compute runnig percentile of repeat donations to campaigns.
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-v','--v', action='store_true', 
-                        help='Output skipped records in the log file.')
+                        help='Output skipped record logs in the log file.')
     parser.add_argument('-m','--m', action='store_true', 
                         help='Modifies the accounting so that the donations '
                              'done within the same calendar year are counted '
