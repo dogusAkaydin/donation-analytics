@@ -4,25 +4,26 @@ import csv
 from collections import defaultdict, namedtuple
 import math
 
-def main(recFilePath,pctFilePath,outFilePath,logFilePath):
-   
+def main(logVerbose,recFilePath,pctFilePath,outFilePath,logFilePath):
     with open(pctFilePath) as pctFile:
         percentile = int(pctFile.readline().rstrip())
    
     logFile = open(logFilePath, 'w')
-
+    divLine = '-'*79+'\n' 
     try:
         outFile = open(outFilePath, 'w')
     except OSError:
         logFile.write('Can not open {0:s} to write.'.format(outFilePath))
     else:
-        logFile.write('Opened {0:s} to record repeat donations' 
-                      'in this format: \n'
+        logFile.write('Opened \n' 
+                      '{0:s} \n' 
+                      'to output the repeat donation stats in the following format: \n'
                       '| Receipent | Donors'' Zip Code| Donation Year' 
                       '| {1:d} Percentile Amount | Total Repeat Donation Amount' 
-                      '| Number of Repeat Donations' 
-                       .format(outFilePath,percentile))
-    
+                      '| Number of Repeat Donations \n'
+                      'The requested percentile value is read from: \n'
+                      '{2:s} \n' 
+                       .format(outFilePath,percentile,pctFilePath))
 
     with open(recFilePath) as recFile:
         records = csv.reader(recFile,delimiter='|')
@@ -39,8 +40,12 @@ def main(recFilePath,pctFilePath,outFilePath,logFilePath):
         nRec = 0
         nValid = 0
         nInvalid = 0
-        logFile.write('Started processing records in: {:s} \n' 
-                       .format(recFilePath))
+        msg = ('Started processing records present in: \n'
+                      '{:s} \n'
+                      'See the end of this log file for a process summary. \n'
+                      +divLine) \
+                      .format(recFilePath)
+        logFile.write(msg)
         for rec in records:
             nRec += 1
             ValidRecord = getRecord(rec,nRec,selectedColumns,colID,nAllColumns,logFile)
@@ -59,7 +64,8 @@ def main(recFilePath,pctFilePath,outFilePath,logFilePath):
                 continue
     outFile.close()
     
-    logFile.write('Gone through a total of {0:d} records. \n' 
+    logFile.write(divLine+ 
+                  'Gone through a total of {0:d} records. \n' 
                   'Processed {1:d} valid records. \n'
                   'Skipped   {2:d} invalid records.\n'
                   'DONE.'.format(nRec,nValid,nInvalid))
@@ -93,11 +99,9 @@ def emitStats(donations,percentile,outFile):
         sl = donations[groupID]
         n = len(sl)
         suml = sum(sl)
-        '''
-        I coud have used an Insertion Sort routine here but I'll let timsort 
-        sort this out -- because it can automatically choose between
-        Merge Sort or Insertion Sort depending on sortedness of the input.
-        '''
+        #I coud have used an Insertion Sort routine here but I'll let timsort 
+        #sort this out -- because it can automatically choose between
+        #Merge Sort or Insertion Sort depending on sortedness of the input.
         try:
             outFile.write('{}|{}|{}|{}\n'.format(groupID,
                            findPercentileValue(sl,percentile,n),suml,n))
@@ -107,23 +111,42 @@ def emitStats(donations,percentile,outFile):
             logFile.write(msg)
             raise OSError(msg)
 
-def getRecord(record,lineNumber,selectedColumns,colID,nAllColumns,logFile):
+def getRecord(record,lineNumber,selectedColumns,colID,
+              nAllColumns,logFile,logVerbose=True):
     name      = record[colID['NAME']]
     zipCode   = record[colID['ZIP_CODE']][0:5]
     year      = record[colID['TRANSACTION_DT']][4:]
-    receipent = record[colID['CMTE_ID']]
+    recipient = record[colID['CMTE_ID']]
     amount    = record[colID['TRANSACTION_AMT']]
-    donorID   = name+'|'+zipCode
-    groupID   = receipent+'|'+zipCode+'|'+year
-    if record[colID['OTHER_ID']] not in (None, ''):
-        logFile.write('"OTHER_ID" not empty. Skipping line:{:d} \n'.format(lineNumber))
-        return None
-    result=namedtuple('ValidRecord', ['donorID', 'groupID', 'amount', 'year'])
-    return result(donorID,groupID,amount,year)
+    if len(record) != nAllColumns:
+        #Check how much impact logVerbose checks have on speed.
+        #Is there a way to bypass the checks entirely if logVerbose is False? 
+        if logVerbose:
+            msg = ('Skipping line {:d} because it has some missing fields.\n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    elif record[colID['OTHER_ID']] not in (None, ''):
+        if logVerbose:
+            msg = ('Skipping line {:d} because "OTHER_ID" field is not empty.\n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    elif any((name,zipCode,year,recipient,amount)) in (None, ''):
+        if logVerbose:
+            msg = ('Skipping line {:d} because a requested field is empty' 
+                                      '          or it does not exist.\n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+    else:
+        donorID   = name+'|'+zipCode
+        groupID   = recipient+'|'+zipCode+'|'+year
+        result=namedtuple('ValidRecord', ['donorID', 'groupID', 'amount', 'year'])
+        return result(donorID,groupID,amount,year)
 
 if __name__ == '__main__':
+    #Add some input checks here:
+    recFilePath=sys.argv[0]
     recFilePath=sys.argv[1]
     pctFilePath=sys.argv[2]
     outFilePath=sys.argv[3]
     logFilePath=sys.argv[4]
-    main(recFilePath,pctFilePath,outFilePath,logFilePath)
+    main(logVerbose,recFilePath,pctFilePath,outFilePath,logFilePath)
