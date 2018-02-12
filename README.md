@@ -27,12 +27,12 @@ See [the full description of the challenge](https://github.com/InsightDataScienc
 ## Summary of the Algorithm:
 
 1. Read the next available record and check if it is valid.
-  1. If the record is valid mold it to a data structure and return that data structure.
-     In this data structure, define each donor with a key (i.e. `donorID`) which is composed of 
-     the donor's name and zip code.
-     In addition, define a donation group with a key (i.e. `groupID`) which is composed of the 
-     recipient, donor's zip code and the donation year.
-  2. If the record is not valid return None.
+   1. If the record is valid mold it to a data structure and return that data structure.
+      In this data structure, define each donor with a key (i.e. `donorID`) which is composed of 
+      the donor's name and zip code.
+      In addition, define a donation group with a key (i.e. `groupID`) which is composed of the 
+      recipient, donor's zip code and the donation year.
+   2. If the record is not valid return None.
 2. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 3. Check if the donor is a repeat donor 
    1. If the donor is a repeat donor,
