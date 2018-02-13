@@ -64,7 +64,8 @@ impact on overall run time because
    to insert sort if the list is almost sorted like this. 
 
 As shown in [Performance and Scalability](Readme.md#performance-and-scalability) all these 
-considerations made the algorithm be scalable almost in O(1) time. 
+considerations made the per-record time complexity about O(1) time, making the overall run time 
+comlexity about O(n) where n is the number of records in the file. 
 
 Footnotes:
 
@@ -92,13 +93,23 @@ donor donates to '--' a subsequent donation to *any* recipent qualifies as a rep
 
 ## Performance and Scalability:
 
+This plots demonstrates the performance and the scalability of my approach.
+I generated this data by running the script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
+records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
+My algorithm and implementation scales nearly linearly up to a record length of 10M.
+Note that the complete year-2016 file, which is the largest one provided, has slighly more than 20M 
+records, which can be processed in about 4 hours.
+The number of records skipped in each batch was less than 10% of n, therefore plotting against the
+number of valid records did not make a noticeable difference. 
+
+![Performance and Scalability](./scaling.png)
 
 [Back to Table of contents](README.md#table-of-contents)
 
 
 ## Extra Features:
-My code generates a file that keeps a log of process, what files were read-in and written-out and 
-how long did it took. 
+My code writes a log file that lists what files were read-in or written-out, how many records were 
+processes or skipped and how long the whole process took. 
 If the command line option `-v` is given, the output becomes more verbose by listing what records 
 were skipped and why.
 
@@ -130,12 +141,10 @@ DONE in 7.737484 seconds of wall clock time
 ```
 In addition, my code automatically finds-out the column numbers of the requested fields from a header 
 file `indiv_header_file.csv` provided by FEC.
-This increases the robostness of the program by eliminating the need for manually finding out and 
+This increases the robustness of the program by eliminating the need for manually finding out and 
 hard-coding the column numbers of the requested fields. 
 
 [Back to Table of contents](README.md#table-of-contents)
-
-
 
 ## Tests:
 
