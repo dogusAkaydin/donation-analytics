@@ -39,13 +39,13 @@ Python 3.6 library.
 1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 1. Check if the donor is a repeat donor.
    A donor is a repeat donor if it's `donorID` is found as a key in  a `dict` called `donors` which 
-   hash-maps each `donorID` to a `set` of years <sup id="a1">[1](#f1)</sup>  that the donor donated within.
+   hash-maps each `donorID` to a `set` of years<sup id="a1">[1](#f1)</sup> that the donor donated within.
    1. If the donor is a repeat donor, 
       1. Append the donation amount to a `list` hash-mapped to this `groupID` in a `dict`.
       1. Accordingly, increment a running sum which is hash-mapped to this `groupID` in another `dict`. 
       1. Compute the desired percentile value and emit the updated values in the format requested.
    1. If the donor is not a repeat donor, add that donor to the `donors` `dict`.
-1. Add the donation year of that donor to its corresponding `set` of donation years.<sup>\*\*</sup>
+1. Add the donation year of that donor to its corresponding `set` of donation years<sup id="a2">[2](#f2)</sup>. 
 1. Loop back to Step 1.
 
 I used hashable data structures (i.e. `set`, `tuple` and `dict`) to contain all immutable data, since 
@@ -68,7 +68,8 @@ considerations made the per-record time complexity about O(1) time, making the o
 comlexity about O(n) where n is the number of records in the file. 
 
 Footnotes:
-<b id="f1">1</b> *Dealing with ambiguity*:
+<b id="f1">1</b> 
+*Dealing with ambiguity*:
 By default, this set of years include all the years donor has made any donation to any recipient. 
 The challenge rules, however, state that
   
