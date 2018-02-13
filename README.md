@@ -47,26 +47,24 @@ Python 3.6 library.
 1. Add the donation year of that donor to its corresponding `set` of donation years.
 1. Loop back to Step 1.
 
-<sup>\*</sup>  *Dealing with ambiguity*: 
-               By default, this set of years include all the years donor has made any donation to any
-               recipient.
-               The challenge rules, however, state that
+<sup>\*</sup>  *Dealing with ambiguity*:
+By default, this set of years include all the years donor has made any donation to any recipient. 
+The challenge rules, however, state that
   
-               > if a donor had previously contributed to any recipient listed in the `itcont.txt` file 
-                in any *prior* calendar year, that donor is considered a repeat donor.
-               (*emphasis* is mine)
+>... if a donor had previously contributed to any recipient listed in the `itcont.txt` file 
+ in any *prior* calendar year, that donor is considered a repeat donor.
 
-               This means that, if a donor has donated multiple times only within the current year, 
-               those donations are NOT counted as repeat donations. 
-               However, multiple donations within a prior year gets counted as repeat.
-               This does not really make much sense. Nevertheless, I devised the command line 
-               option `-s`, which sets `strictRepeat == True`, to allow for this type of an 
-               accounting, just in case.
+(*emphasis* is mine)
+This means that, if a donor has donated multiple times only within the current year, 
+those donations are NOT counted as repeat donations.
+However, multiple donations within a prior year gets counted as repeat.
+This did not really make much sense to me, especially due to the fact that some records can come in
+non-chronological order.
+Nevertheless, I devised the command line option `-s, which sets `strictRepeat == True, to allow for 
+this type of an accounting, just in case.
    
-<sup>\*\*</sup> As per the challenge rules, there is no distiction made here as to which recipient 
-               the donor donates to -- donations to any recipent qualifies as a repeat donation.
-
-
+<sup>\*\*</sup> As per the challenge rules, there is no distiction made here as to which recipient the 
+donor donates to -- donations to any recipent qualifies as a repeat donation.
 
 [Back to Table of contents](README.md#table-of-contents)
 
