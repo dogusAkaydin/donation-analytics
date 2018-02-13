@@ -68,7 +68,8 @@ considerations made the per-record time complexity about O(1) time, making the o
 comlexity about O(n) where n is the number of records in the file. 
 
 Footnotes:
-<b id="f1">1</b> 
+<b id="f1">1</b>
+ 
 *Dealing with ambiguity*:
 By default, this set of years include all the years donor has made any donation to any recipient. 
 The challenge rules, however, state that
@@ -87,7 +88,7 @@ this type of an accounting, just in case. When this option is turned-on, the cur
 from that `set` of donation years. 
  [↩](#a1)
 
-<b id="f2">1</b>
+<b id="f2">2</b>
  As per the challenge rules, there is no distiction made here as to what recipient the 
 donor donates to '--' a subsequent donation to *any* recipent qualifies as a repeat donation.
  [↩](#a2)
