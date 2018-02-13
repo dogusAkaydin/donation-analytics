@@ -32,39 +32,18 @@ See [the full description of the challenge](https://github.com/InsightDataScienc
       the donor's name and zip code.
       In addition, define a donation group with a key (i.e. `groupID`) which is composed of the 
       recipient, donor's zip code and the donation year.
-   2. If the record is not valid return null.
-2. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
-3. Check if the donor is a repeat donor.
+   1. If the record is not valid return null.
+1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
+1. Check if the donor is a repeat donor.
    A donor is a repeat donor if it's `donorID` is found as a key in `donors` hash-map, 
-   which maps each `donorID` to a set of years that the donor donated within.<sup>\*<sup>.
-   1. If the donor is a repeat donor,
-      1. Append the donation amount to a list hash-mapped to this `groupID`.
-      2. Increment a running sum, which is hash-mapped to this `groupID`, by this donation amount.
-      3. Compute the desired percentile value and emit the updated values in the format requested.
-   2. If the donor is not a repeat donor, add that donor to the `donors` hash-map.
-5. Add the donation year of that donor to its corresponding set of donation years.
-6. Loop back to Step 1.
-
-
-<sup>\*<sup>   *Dealing with ambiguity*: 
-               By default, this set of years include all the years donor has made any donation to any
-               recipient.
-               The challenge rules, however, state that
-  
-               >if a donor had previously contributed to any recipient listed in the `itcont.txt` file 
-                in any *prior* calendar year, that donor is considered a repeat donor.
-               (*emphasis* is mine)
-
-               This means that, if a donor has donated multiple times only within the current year, 
-               those donations are NOT counted as repeat donations. 
-               However, multiple donations within a prior year gets counted as repeat.
-               This does not really make much sense. Nevertheless, I devised the command line 
-               option `-s`, which sets `strictRepeat == True`, to allow for this type of an 
-               accounting, just in case.
-   
-<sup>\*\*<sup> As per the challenge rules, there is no distiction made here as to which recipient 
-               the donor donates to -- donations to any recipent qualifies as a repeat donation.
-
+   which maps each `donorID` to a set of years that the donor donated within<sup>\*<sup>.
+   1. If the donor is a repeat donor, 
+    1. Append the donation amount to a list hash-mapped to this `groupID`.
+    1. Increment a running sum, which is hash-mapped to this `groupID`, by this donation amount.
+    1. Compute the desired percentile value and emit the updated values in the format requested.
+   1. If the donor is not a repeat donor, add that donor to the `donors` hash-map.
+1. Add the donation year of that donor to its corresponding set of donation years.
+1. Loop back to Step 1.
 
 [Back to Table of contents](README.md#table-of-contents)
 
