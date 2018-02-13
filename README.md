@@ -102,7 +102,7 @@ records, which can be processed in about 4 hours.
 The number of records skipped in each batch was less than 10% of n, therefore plotting against the
 number of valid records did not make a noticeable difference. 
 
-![Performance and Scalability](./scaling.png)
+![Performance and Scalability](./scaleUp.png)
 
 [Back to Table of contents](README.md#table-of-contents)
 
