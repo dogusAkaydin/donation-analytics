@@ -2,11 +2,10 @@
 
 ## Table of Contents
 1. [Summary of the Challenge](README.md#summary-of-the-challenge)
-2. [Summary of the Algorithm](README.md#summary-of-the-algorithm)
-3. [Summary of the Implementation](README.md#summary-of-the-implemention)
-4. [Tests](README.md#tests)
-5. [Scalability](README.md#scalability)
-6. [Summary](README.md#summary)
+1. [Summary of the Algorithm and the Implementation](README.md#summary-of-the-algorithm-and-the-implementation)
+1. [Tests](README.md#tests)
+1. [Scalability](README.md#scalability)
+1. [Summary](README.md#summary)
 
 ## Summary of the Challenge:
 A series of donation records stream in from a file, line-by-line. 
@@ -24,25 +23,28 @@ See [the full description of the challenge](https://github.com/InsightDataScienc
 [Back to Table of contents](README.md#table-of-contents)
 
 
-## Summary of the Algorithm:
+## Summary of the Algorithm and the Implementation:
+The following algorithm is implemented using Python 3.6 came in Anaconda 3 distribution. 
+Although I used an Anaconda distribution, I have only used modules that are present in standard 
+Python 3.6 library.
 
 1. Read the next available record and check if it is valid.
-   1. If the record is valid mold it to a data structure and return that data structure.
+   1. If the record is valid mold it to `namedtuple` and return that data structure. 
       In this data structure, define each donor with a key (i.e. `donorID`) which is composed of 
       the donor's name and zip code.
-      In addition, define a donation group with a key (i.e. `groupID`) which is composed of the 
+      In addition, define each donation group with key (i.e. `groupID`) which is composed of the 
       recipient, donor's zip code and the donation year.
    1. If the record is not valid return null.
 1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 1. Check if the donor is a repeat donor.
-   A donor is a repeat donor if it's `donorID` is found as a key in `donors` hash-map, 
-   which maps each `donorID` to a set of years that the donor donated within<sup>\*</sup>.
+   A donor is a repeat donor if it's `donorID` is found as a key in  a `dict` called `donors` which 
+   hash-maps each `donorID` to a `set` of years that the donor donated within<sup>\*</sup>.
    1. If the donor is a repeat donor, 
-      1. Append the donation amount to a list hash-mapped to this `groupID`.
-      1. Increment a running sum, which is hash-mapped to this `groupID`, by this donation amount.
+      1. Append the donation amount to a list hash-mapped to this `groupID` in a `dict`.
+      1. Accordingly, increment a running sum which is hash-mapped to this `groupID` in another `dict`. 
       1. Compute the desired percentile value and emit the updated values in the format requested.
-   1. If the donor is not a repeat donor, add that donor to the `donors` hash-map.
-1. Add the donation year of that donor to its corresponding set of donation years.
+   1. If the donor is not a repeat donor, add that donor to the `donors` `dict`.
+1. Add the donation year of that donor to its corresponding `set` of donation years.
 1. Loop back to Step 1.
 
 [Back to Table of contents](README.md#table-of-contents)
