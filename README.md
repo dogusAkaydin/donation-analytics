@@ -40,12 +40,29 @@ Python 3.6 library.
    A donor is a repeat donor if it's `donorID` is found as a key in  a `dict` called `donors` which 
    hash-maps each `donorID` to a `set` of years that the donor donated within<sup>\*</sup>.
    1. If the donor is a repeat donor, 
-      1. Append the donation amount to a list hash-mapped to this `groupID` in a `dict`.
+      1. Append the donation amount to a `list` hash-mapped to this `groupID` in a `dict`.
       1. Accordingly, increment a running sum which is hash-mapped to this `groupID` in another `dict`. 
       1. Compute the desired percentile value and emit the updated values in the format requested.
    1. If the donor is not a repeat donor, add that donor to the `donors` `dict`.
 1. Add the donation year of that donor to its corresponding `set` of donation years.
 1. Loop back to Step 1.
+
+I used hashable data structures (i.e. `set`, `tuple` and `dict`) to contain all immutable data, since 
+these data structures allow looking-up and setting in O(1) on average.
+The donations mentioned in 3.i.a are stored in a `list` so that it could be sorted as required by the
+percentile computations.
+While this sorting operation is performed for every repeat donation, it does not make a super-linear 
+impact on overall run time because
+1. The list is always appended which takes O(1) time. 
+1. The length of a typical `list` is much smaller than total number of records, i.e. `k` << `n`.
+1. The `list` comes pre-sorted from a previous update except for its last element newly appended.
+   The .sorted() method, which implements Timsort algorithm takes O(k), not O(klogk), time by adapting
+   to insert sort if the list is almost sorted like this. 
+1. The sum of this `list` is not recomputed; instead, it is updated as a running total in one-level
+   outer loop. This avoids the O(k) impact of having a `sum()` operation in the innermost loop.  
+
+As shown in [Performance and Scalability](Readme.md#performance-and-scalability) all these 
+considerations made the algorithm be scalable almost in O(1) time. 
 
 <sup>\*</sup>  *Dealing with ambiguity*:
 By default, this set of years include all the years donor has made any donation to any recipient. 
@@ -54,23 +71,18 @@ The challenge rules, however, state that
 >... if a donor had previously contributed to any recipient listed in the `itcont.txt` file 
  in any *prior* calendar year, that donor is considered a repeat donor.
 
-(*emphasis* is mine)
+(*emphasis* is mine). 
 This means that, if a donor has donated multiple times only within the current year, 
 those donations are NOT counted as repeat donations.
 However, multiple donations within a prior year gets counted as repeat.
 This did not really make much sense to me, especially due to the fact that some records can come in
 non-chronological order.
 Nevertheless, I devised the command line option `-s, which sets `strictRepeat == True, to allow for 
-this type of an accounting, just in case.
+this type of an accounting, just in case. When this option is turned-on, the current year is excluded
+from that `set` of donation years. 
    
 <sup>\*\*</sup> As per the challenge rules, there is no distiction made here as to which recipient the 
 donor donates to -- donations to any recipent qualifies as a repeat donation.
-
-[Back to Table of contents](README.md#table-of-contents)
-
-
-## Summary of the Implementation:
-
 
 [Back to Table of contents](README.md#table-of-contents)
 
