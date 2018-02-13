@@ -36,7 +36,7 @@ See [the full description of the challenge](https://github.com/InsightDataScienc
 1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 1. Check if the donor is a repeat donor.
    A donor is a repeat donor if it's `donorID` is found as a key in `donors` hash-map, 
-   which maps each `donorID` to a set of years that the donor donated within<sup>\*<sup>.
+   which maps each `donorID` to a set of years that the donor donated within<sup>\*</sup>.
    1. If the donor is a repeat donor, 
     1. Append the donation amount to a list hash-mapped to this `groupID`.
     1. Increment a running sum, which is hash-mapped to this `groupID`, by this donation amount.
