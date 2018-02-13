@@ -39,13 +39,13 @@ Python 3.6 library.
 1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 1. Check if the donor is a repeat donor.
    A donor is a repeat donor if it's `donorID` is found as a key in  a `dict` called `donors` which 
-   hash-maps each `donorID` to a `set` of years<sup>\*</sup> that the donor donated within.
+   hash-maps each `donorID` to a `set` of years <sup id="a1">[1](#f1)</sup>  that the donor donated within.
    1. If the donor is a repeat donor, 
       1. Append the donation amount to a `list` hash-mapped to this `groupID` in a `dict`.
       1. Accordingly, increment a running sum which is hash-mapped to this `groupID` in another `dict`. 
       1. Compute the desired percentile value and emit the updated values in the format requested.
    1. If the donor is not a repeat donor, add that donor to the `donors` `dict`.
-1. Add the donation year of that donor to its corresponding `set` of donation years.
+1. Add the donation year of that donor to its corresponding `set` of donation years.<sup>\*\*</sup>
 1. Loop back to Step 1.
 
 I used hashable data structures (i.e. `set`, `tuple` and `dict`) to contain all immutable data, since 
@@ -68,8 +68,7 @@ considerations made the per-record time complexity about O(1) time, making the o
 comlexity about O(n) where n is the number of records in the file. 
 
 Footnotes:
-
-<sup>\*</sup>  *Dealing with ambiguity*:
+<b id="f1">1</b> *Dealing with ambiguity*:
 By default, this set of years include all the years donor has made any donation to any recipient. 
 The challenge rules, however, state that
   
@@ -85,10 +84,13 @@ non-chronological order.
 Nevertheless, I devised the command line option `-s`, which sets `strictRepeat = True`, to allow for 
 this type of an accounting, just in case. When this option is turned-on, the current year is excluded
 from that `set` of donation years. 
-   
-<sup>\*\*</sup> As per the challenge rules, there is no distiction made here as to what recipient the 
-donor donates to '--' a subsequent donation to *any* recipent qualifies as a repeat donation.
+ [↩](#a1)
 
+<b id="f2">1</b>
+ As per the challenge rules, there is no distiction made here as to what recipient the 
+donor donates to '--' a subsequent donation to *any* recipent qualifies as a repeat donation.
+ [↩](#a2)
+  
 [Back to Table of contents](README.md#table-of-contents)
 
 ## Performance and Scalability:
@@ -96,9 +98,9 @@ donor donates to '--' a subsequent donation to *any* recipent qualifies as a rep
 This plots demonstrates the performance and the scalability of my approach.
 I generated this data by running the script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
 records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
-My algorithm and implementation scales nearly linearly up to a record length of 10M.
+My algorithm and implementation scales up nearly linearly to at least 10M records.
 Note that the complete year-2016 file, which is the largest one provided, has slighly more than 20M 
-records, which can be processed in about 4 hours.
+records, which can be processed in about 4 hours according to this scaling.
 The number of records skipped in each batch was less than 10% of n, therefore plotting against the
 number of valid records did not make a noticeable difference. 
 
