@@ -213,7 +213,7 @@ Processing. See process logs in ./test_2016/output/log_1M.txt
 
 ```
 
-In addition to these program test, I added assertion-based unit tests in isRealNumber(s) 
+In addition to these program tests, I added assertion-based unit tests in isRealNumber(s) 
 function for demonstration purposes.
 
 [Back to Table of contents](README.md#table-of-contents)
