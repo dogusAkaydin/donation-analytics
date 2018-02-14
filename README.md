@@ -107,9 +107,9 @@ records, which can be processed in about 3:30 hours according to this scaling.
 
 ![Performance and Scalability](./scaleUp.png)
 
-[Back to Table of contents](README.md#table-of-contents)
-
 Since each record must be examined this scaling is as good as it gets for this problem.
+
+[Back to Table of contents](README.md#table-of-contents)
 
 ## Extra Features
 
