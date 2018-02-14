@@ -6,7 +6,6 @@
 1. [Performance and Scalability](README.md#performance-and-scalability)
 1. [Extra Features](README.md#extra-features)
 1. [Tests](README.md#tests)
-1. [Summary](README.md#summary)
 
 ## Summary of the Challenge:
 A series of donation records stream in from a file, line-by-line. 
@@ -96,8 +95,8 @@ donor donates -- a subsequent donation to *any* recipent qualifies as a repeat d
 
 ## Performance and Scalability
 Since my implementation does almost a constant-time (O(1)) work per each record, the overall
-run time per n records should scale linarly (O(n)).  
-This plot demonstrates that my apprach does scale-up linearly upto a reasonably large number of 
+run time per n records should scale linarly (O(n)). 
+This plot demonstrates that my apprach does scale-up linearly up to reasonably large numbers of 
 records.
 I generated this data by running my script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
 records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
