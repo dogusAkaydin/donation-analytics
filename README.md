@@ -169,7 +169,7 @@ DONE in 0.010658 seconds of wall clock time
 [Back to Table of contents](README.md#table-of-contents)
 
 ## Usage
-
+```
 usage: donation-analytics.py [-h] [-v] [-s]
                              recFilePath pctFilePath outFilePath logFilePath
 
@@ -190,7 +190,7 @@ optional arguments:
   -v, --v      Outputs any skipped records in the log file.
   -s, --s      Modifies isRepeat so that the donations done within the current
                calendar year are NOT counted as repeat donation.
-
+```
 ## Tests
 
 I added input validation tests and algorithm correctness tests inside the test suite directory.
