@@ -5,6 +5,7 @@
 1. [Summary of the Algorithm and the Implementation](README.md#summary-of-the-algorithm-and-the-implementation)
 1. [Performance and Scalability](README.md#performance-and-scalability)
 1. [Extra Features](README.md#extra-features)
+1. [Usage](README.md#usage)
 1. [Tests](README.md#tests)
 
 ## Summary of the Challenge:
@@ -167,6 +168,29 @@ DONE in 0.010658 seconds of wall clock time
 ```
 [Back to Table of contents](README.md#table-of-contents)
 
+## Usage
+
+usage: donation-analytics.py [-h] [-v] [-s]
+                             recFilePath pctFilePath outFilePath logFilePath
+
+Insight Data Engineering coding challenge: Compute running percentile of
+repeat donations to US political campaigns based on FEC data.
+
+positional arguments:
+  recFilePath  Path to the record file provided by FEC
+  pctFilePath  Path to the file that holds the desired percentile value
+               between 0 and 100.
+  outFilePath  Path to the file where the repeat donation results are written
+               to.
+  logFilePath  Path to the file where a log of process (stats, skipped lines,
+               etc.) are written to.
+
+optional arguments:
+  -h, --help   show this help message and exit
+  -v, --v      Outputs any skipped records in the log file.
+  -s, --s      Modifies isRepeat so that the donations done within the current
+               calendar year are NOT counted as repeat donation.
+
 ## Tests
 
 I added input validation tests and algorithm correctness tests inside the test suite directory.
@@ -195,7 +219,7 @@ PASS: ./test_3/output/repeat_donors-v.txt
 PASS: ./test_3/output/repeat_donors-s.txt
 PASS: ./test_3/output/repeat_donors-s-v.txt
 -----------------------------------------------------------------------------------------
-Performance and Scale-up Test
+PERFORMANCE and SCALE-UP TEST:
 Processing. See process logs in ./test_2016/output/log_1.txt
 DONE in 0.00370216 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_10.txt
