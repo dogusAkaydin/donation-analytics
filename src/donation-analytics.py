@@ -95,7 +95,7 @@ def main(recFilePath = './itcont.txt',
                  continue
          dtWall = time.time() - t0wall
          msg = (divLine+ 
-                'Gone through a total of {0:d} records. \n' 
+                'Gone through a total of {0:d} lines. \n' 
                 'Processed {1:d} valid records. \n'
                 'Skipped   {2:d} invalid records.\n'
                 'DONE in {3:f} seconds of wall clock time '
