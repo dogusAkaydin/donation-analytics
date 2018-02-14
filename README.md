@@ -124,29 +124,47 @@ were skipped and why.
 
 ```
 Opened
-./test_2016/output/repeat_donors_10k.txt
+./test_2/output/repeat_donors-v.txt
 to output the repeat donation stats in the following format:
 | Receipent | Donors Zip Code| Donation Year| 30 Percentile Amount | Total Repeat Donation Amount| Number of Repeat Donations
 The requested percentile value is read from:
-./test_2016/input/percentile.txt
+./test_2/input/percentile.txt
 Started processing records present in:
-./test_2016/input/itcont_10k.txt
+./test_2/input/itcont.txt
 See the end of this log file for a process summary.
 -------------------------------------------------------------------------------
-Skipping record 820 because "ZIP_CODE" field does not exits, it is empty, or malformed:
-Skipping record 821 because "ZIP_CODE" field does not exits, it is empty, or malformed:
-Skipping record 822 because "ZIP_CODE" field does not exits, it is empty, or malformed:
-Skipping record 938 because "OTHER_ID" field is not empty: C00484535
-Skipping record 942 because "OTHER_ID" field is not empty: H6CA53047
-Skipping record 943 because "OTHER_ID" field is not empty: H6CA53047
-Skipping record 944 because "OTHER_ID" field is not empty: H6CA53047
-Skipping record 946 because "OTHER_ID" field is not empty: H2SC07108
-...
+Skipping line 1               because it is commented-out: #A truncated record: ...
+Skipping line 2               because it has some missing fields.
+Skipping line 3               because it is commented-out: #A blank record: ...
+Skipping line 4               because it is a blank line: [] ...
+Skipping line 5               because it is commented-out: #A lone delimiter record: ...
+Skipping line 6               because it has some missing fields.
+Skipping line 7               because it is commented-out: #Non-empty OtherID ...
+Skipping line 8               because "OTHER_ID" field is not empty: AB12
+Skipping line 9               because it is commented-out: #Missing Recipient ...
+Skipping line 10              because "CMTE_ID" field is missing or empty
+Skipping line 11              because it is commented-out: #Missing Name ...
+Skipping line 12              because "NAME" field is blank.
+Skipping line 13              because it is commented-out: #Missing Zip Code ...
+Skipping line 14              because "ZIP_CODE" field does not exits, it is empty, or malformed:
+Skipping line 15              because it is commented-out: #Truncated Zip Code ...
+Skipping line 16              because "ZIP_CODE" field does not exits, it is empty, or malformed: 0289
+Skipping line 17              because it is commented-out: #Missing Date ...
+Skipping line 18              because "TRANSACTION_DT" field is empty or it does not exist.
+Skipping line 19              because it is commented-out: #Blank date ...
+Skipping line 20              because "TRANSACTION_AMT" field is malformed or non-positive:
+Skipping line 21              because it is commented-out: #Malformed Date #1 ...
+Skipping line 22              because "TRANSACTION_DT" field is malformed: 123
+Skipping line 23              because it is commented-out: #Impossible Date ...
+Skipping line 24              because "TRANSACTION_DT" field is malformed: 13012018
+Skipping line 25              because it is commented-out: #A good record: ...
+Skipping line 27              because it is commented-out: #Blank OtherID: This is OK ...
+Skipping line 29              because it is commented-out: #Partially-true Zip Code: This is OK ...
 -------------------------------------------------------------------------------
-Gone through a total of 10000 records.
-Processed 9237 valid records.
-Skipped   763 invalid records.
-DONE in 7.737484 seconds of wall clock time
+Gone through a total of 30 records.
+Processed 3 valid records.
+Skipped   12 invalid records.
+DONE in 0.010658 seconds of wall clock time
 ```
 [Back to Table of contents](README.md#table-of-contents)
 
@@ -176,10 +194,26 @@ ALGORITHM CORRECTNESS TESTS:
 PASS: ./test_3/output/repeat_donors.txt
 PASS: ./test_3/output/repeat_donors-v.txt
 PASS: ./test_3/output/repeat_donors-s.txt
-PASS: ./test_3/output/repeat_donors-s-v.txt 
+PASS: ./test_3/output/repeat_donors-s-v.txt
+-----------------------------------------------------------------------------------------
+Performance and Scale-up Test
+Processing. See process logs in ./test_2016/output/log_1.txt
+DONE in 0.00370216 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_10.txt
+DONE in  0.0118251 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_100.txt
+DONE in  0.0831828 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_1k.txt
+DONE in    0.80427 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_10k.txt
+DONE in    7.40172 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_100k.txt
+DONE in    78.7633 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_1M.txt
+
 ```
 
-In addition to these program test, I unit tests in some functions for demonstration 
-purposes.
+In addition to these program test, I added assertion-based unit tests in isRealNumber(s) 
+function for demonstration purposes.
 
 [Back to Table of contents](README.md#table-of-contents)
