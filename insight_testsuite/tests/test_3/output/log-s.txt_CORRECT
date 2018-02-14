@@ -1,0 +1,16 @@
+Opened 
+./test_3/output/repeat_donors-s.txt 
+to output the repeat donation stats in the following format: 
+| Receipent | Donors Zip Code| Donation Year| 30 Percentile Amount | Total Repeat Donation Amount| Number of Repeat Donations 
+The requested percentile value is read from: 
+./test_3/input/percentile.txt 
+Started processing records present in: 
+./test_3/input/itcont.txt 
+See the end of this log file for a process summary. 
+-------------------------------------------------------------------------------
+Use command line option -v to see verbose output here.
+-------------------------------------------------------------------------------
+Gone through a total of 16 records. 
+Processed 16 valid records. 
+Skipped   0 invalid records.
+DONE in 0.020333 seconds of wall clock time 
