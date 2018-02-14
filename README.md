@@ -89,7 +89,7 @@ from that `set` of donation years.
 
 <b id="f2">2.</b>
  As per the challenge rules, there is no distiction made here as to what recipient the 
-donor donates to '--' a subsequent donation to *any* recipent qualifies as a repeat donation.
+donor donates -- a subsequent donation to *any* recipent qualifies as a repeat donation.
  [↩](#a2)
   
 [Back to Table of contents](README.md#table-of-contents)
