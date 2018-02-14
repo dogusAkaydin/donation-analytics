@@ -38,7 +38,7 @@ Python 3.6 library.
    1. If the record is not valid return null.
 1. If a valid record is returned proceed to the next step. Otherwise loop back to Step 1.
 1. Check if the donor is a repeat donor.
-   A donor is a repeat donor if it's `donorID` is found as a key in  a `dict` called `donors` which 
+   A donor is a repeat donor if its `donorID` is found as a key in  a `dict` called `donors`, which 
    hash-maps each `donorID` to a `set` of years<sup id="a1">[1](#f1)</sup> that the donor donated within.
    1. If the donor is a repeat donor, 
       1. Append the donation amount to a `list` hash-mapped to this `groupID` in a `dict`.
@@ -50,18 +50,19 @@ Python 3.6 library.
 
 I used hashable data structures (i.e. `set`, `tuple` and `dict`) to contain all immutable data, since 
 these data structures allow looking-up and setting in O(1) on average.
-The donations mentioned in 3.i.a are stored in a `list` so that it could be sorted as required by the
-percentile computations.
-While this sorting operation is performed for every repeat donation, it does not make a super-linear 
+The donations mentioned in Step 3.i.a are stored in a `list` so that it could be summed, sorted and 
+index-accessed for the percentile computations.
+While these operations are performed for every repeat donation, it does not make a super-linear 
 impact on overall run time because
-1. The sum of this `list` is not recomputed; instead, it is updated as a running total within a loop
+1. The length of a typical `list` is much smaller than total number of records, i.e. `k` << `n` 
+1. The sum of this `list` is not recomputed; instead, it is updated as a running total within the loop
    one-level outside.
    This avoids the O(k) impact of a `sum()` operation within the innermost loop.
-1. The other operations done on this `list` in this algorithm (`len()`, look-up and append) require O(1) time.   
-1. The length of a typical `list` is much smaller than total number of records, i.e. `k` << `n`.
-1. The `list` comes pre-sorted from a previous update except for its last element newly appended.
+1. The `list` comes pre-sorted from a previous update except for its last element which is just appended.
    The `.sorted()` method, which implements Timsort algorithm takes O(k), not O(klogk), time by adapting
-   to insert sort if the list is almost sorted like this. 
+   to insert sort if the list is almost sorted like this.
+1. The other operations done on this `list` in this algorithm (i.e. `len()`, look-up and .append()) require 
+    O(1) time.   
 
 As shown in [Performance and Scalability](Readme.md#performance-and-scalability) all these 
 considerations made the per-record time complexity about O(1) time, making the overall run time 
@@ -78,14 +79,12 @@ The challenge rules, however, state that
  in any *prior* calendar year, that donor is considered a repeat donor.
 
 (*emphasis* is mine). 
-This means that, if a donor has donated multiple times only within the current year, 
-those donations are *not* counted as repeat donations.
-However, multiple donations within a prior year gets counted as repeat.
-This did not really make much sense to me, especially due to the fact that some records can come in
+This means that, multiple donations within the current year are *not* counted as repeat donations.
+This did not really make much sense to me, also due to the fact that the records can come in
 non-chronological order.
 Nevertheless, I devised the command line option `-s`, which sets `strictRepeat = True`, to allow for 
-this type of an accounting, just in case. When this option is turned-on, the current year is excluded
-from that `set` of donation years. 
+this type of an accounting, if needed. 
+When this option is turned-on, the current year is excluded from that `set` of donation years. 
  [↩](#a1)
 
 <b id="f2">2.</b>
@@ -102,8 +101,9 @@ This plot demonstrates that my approach indeed scales up linearly.
 I generated this data by running my script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
 records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
 My algorithm and implementation scales up nearly linearly to at least 10M records.
-Note that the complete year-2016 file, which is the largest one provided, has slighly more than 20M 
-records, which can be processed in about 3:30 hours according to this scaling.
+Note that the complete year-2016 file, which is currently the largest one provided in FEC website, 
+has slighly more than 20M records. According to this scaling, my algorithm can process this many 
+records in about 3:30 hours -- and it did, I've tested it).
 
 ![Performance and Scalability](./scaleUp.png)
 
@@ -120,8 +120,9 @@ hard-coding the column numbers of the requested fields.
 
 In addition, my code writes a log file that lists what files were read in or written out, how many records were 
 processes or skipped and how long the whole process took. 
-If the command line option `-v` is given, the output becomes more verbose by listing what records 
-were skipped and why.
+If the command line option `-v` is provided, the output becomes more verbose by listing what records 
+were skipped and why. The following is a sample from my `test_2` with option `-v`. The part within the dashed
+lines disappears if `-v` is not provided.
 
 ```
 Opened
@@ -222,19 +223,23 @@ PASS: ./test_3/output/repeat_donors-s-v.txt
 -----------------------------------------------------------------------------------------
 PERFORMANCE and SCALE-UP TEST:
 Processing. See process logs in ./test_2016/output/log_1.txt
-DONE in 0.00370216 seconds of wall clock time
+DONE in 0.00356817 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_10.txt
-DONE in  0.0118251 seconds of wall clock time
+DONE in  0.0111852 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_100.txt
-DONE in  0.0831828 seconds of wall clock time
+DONE in   0.086674 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_1k.txt
-DONE in    0.80427 seconds of wall clock time
+DONE in   0.772814 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_10k.txt
-DONE in    7.40172 seconds of wall clock time
+DONE in    7.96312 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_100k.txt
-DONE in    78.7633 seconds of wall clock time
+DONE in    82.4028 seconds of wall clock time
 Processing. See process logs in ./test_2016/output/log_1M.txt
-
+DONE in    751.422 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_10M.txt
+DONE in    6563.69 seconds of wall clock time
+Processing. See process logs in ./test_2016/output/log_all20M.txt
+DONE in    12714.6 seconds of wall clock time
 ```
 
 In addition to these program tests, I added assertion-based unit tests in isRealNumber(s) 
