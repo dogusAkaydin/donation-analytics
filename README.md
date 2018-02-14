@@ -112,12 +112,12 @@ records, which can be processed in about 4 hours according to this scaling.
 
 ## Extra Features
 
-My code automatically finds-out the column numbers of the requested fields from a header 
+My code automatically finds out the column numbers of the requested fields from a header 
 file `indiv_header_file.csv` provided by FEC.
 This increases the robustness of the program by eliminating the need for manually finding out and 
 hard-coding the column numbers of the requested fields. 
 
-In addition, my code writes a log file that lists what files were read-in or written-out, how many records were 
+In addition, my code writes a log file that lists what files were read in or written out, how many records were 
 processes or skipped and how long the whole process took. 
 If the command line option `-v` is given, the output becomes more verbose by listing what records 
 were skipped and why.
