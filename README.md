@@ -24,7 +24,7 @@ See [the full description of the challenge](https://github.com/InsightDataScienc
 [Back to Table of contents](README.md#table-of-contents)
 
 
-## Summary of the Algorithm and the Implementation:
+## Summary of the Algorithm and the Implementation
 The following algorithm is implemented using Python 3.6 came in Anaconda 3 distribution. 
 Although I used an Anaconda distribution, I have only used modules that are present in standard 
 Python 3.6 library.
@@ -57,7 +57,7 @@ impact on overall run time because
 1. The sum of this `list` is not recomputed; instead, it is updated as a running total within a loop
    one-level outside.
    This avoids the O(k) impact of a `sum()` operation within the innermost loop.
-1. All other operations done on this `list` (`len()`, look-up and append) take O(1)   
+1. The other operations done on this `list` in this algorithm (`len()`, look-up and append) require O(1) time.   
 1. The length of a typical `list` is much smaller than total number of records, i.e. `k` << `n`.
 1. The `list` comes pre-sorted from a previous update except for its last element newly appended.
    The `.sorted()` method, which implements Timsort algorithm takes O(k), not O(klogk), time by adapting
@@ -68,9 +68,8 @@ considerations made the per-record time complexity about O(1) time, making the o
 comlexity about O(n) where n is the number of records in the file. 
 
 Footnotes:
-<b id="f1">1</b>
- 
-*Dealing with ambiguity*:
+
+<b id="f1">1.</b> *Dealing with ambiguity*:
 By default, this set of years include all the years donor has made any donation to any recipient. 
 The challenge rules, however, state that
   
@@ -88,31 +87,37 @@ this type of an accounting, just in case. When this option is turned-on, the cur
 from that `set` of donation years. 
  [↩](#a1)
 
-<b id="f2">2</b>
+<b id="f2">2.</b>
  As per the challenge rules, there is no distiction made here as to what recipient the 
 donor donates to '--' a subsequent donation to *any* recipent qualifies as a repeat donation.
  [↩](#a2)
   
 [Back to Table of contents](README.md#table-of-contents)
 
-## Performance and Scalability:
-
-This plots demonstrates the performance and the scalability of my approach.
-I generated this data by running the script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
+## Performance and Scalability
+Since my implementation does almost a constant-time (O(1)) work per each record, the overall
+run time per n records should scale linarly (O(n)).  
+This plot demonstrates that my apprach does scale-up linearly upto a reasonably large number of 
+records.
+I generated this data by running my script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
 records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
 My algorithm and implementation scales up nearly linearly to at least 10M records.
 Note that the complete year-2016 file, which is the largest one provided, has slighly more than 20M 
 records, which can be processed in about 4 hours according to this scaling.
-The number of records skipped in each batch was less than 10% of n, therefore plotting against the
-number of valid records did not make a noticeable difference. 
 
 ![Performance and Scalability](./scaleUp.png)
 
 [Back to Table of contents](README.md#table-of-contents)
 
 
-## Extra Features:
-My code writes a log file that lists what files were read-in or written-out, how many records were 
+## Extra Features
+
+My code automatically finds-out the column numbers of the requested fields from a header 
+file `indiv_header_file.csv` provided by FEC.
+This increases the robustness of the program by eliminating the need for manually finding out and 
+hard-coding the column numbers of the requested fields. 
+
+In addition, my code writes a log file that lists what files were read-in or written-out, how many records were 
 processes or skipped and how long the whole process took. 
 If the command line option `-v` is given, the output becomes more verbose by listing what records 
 were skipped and why.
@@ -143,22 +148,38 @@ Processed 9237 valid records.
 Skipped   763 invalid records.
 DONE in 7.737484 seconds of wall clock time
 ```
-In addition, my code automatically finds-out the column numbers of the requested fields from a header 
-file `indiv_header_file.csv` provided by FEC.
-This increases the robustness of the program by eliminating the need for manually finding out and 
-hard-coding the column numbers of the requested fields. 
-
 [Back to Table of contents](README.md#table-of-contents)
 
-## Tests:
+## Tests
 
+I added input validation tests and algorithm correctness tests inside the test suite directory.
+I also added a custom `bash` script to run these tests. 
+Here is a sample output:
+
+```
+-----------------------------------------------------------------------------------------
+INSIGHTS DEMO TEST:
+PASS: ./test_1/output/repeat_donors.txt
+PASS: ./test_1/output/repeat_donors-v.txt
+PASS: ./test_1/output/repeat_donors-s.txt
+PASS: ./test_1/output/repeat_donors-s-v.txt
+-----------------------------------------------------------------------------------------
+INPUT VALIDATION TESTS:
+PASS: ./test_2/output/repeat_donors.txt
+PASS: ./test_2/output/repeat_donors-v.txt
+PASS: ./test_2/output/log-v.txt
+PASS: ./test_2/output/repeat_donors-s.txt
+PASS: ./test_2/output/repeat_donors-s-v.txt
+PASS: ./test_2/output/log-s-v.txt
+-----------------------------------------------------------------------------------------
+ALGORITHM CORRECTNESS TESTS:
+PASS: ./test_3/output/repeat_donors.txt
+PASS: ./test_3/output/repeat_donors-v.txt
+PASS: ./test_3/output/repeat_donors-s.txt
+PASS: ./test_3/output/repeat_donors-s-v.txt 
+```
+
+In addition to these program test, I unit tests in some functions for demonstration 
+purposes.
 
 [Back to Table of contents](README.md#table-of-contents)
-
-
-## Summary:
-
-
-[Back to Table of contents](README.md#table-of-contents)
-
-
