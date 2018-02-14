@@ -161,7 +161,7 @@ Skipping line 25              because it is commented-out: #A good record: ...
 Skipping line 27              because it is commented-out: #Blank OtherID: This is OK ...
 Skipping line 29              because it is commented-out: #Partially-true Zip Code: This is OK ...
 -------------------------------------------------------------------------------
-Gone through a total of 30 records.
+Gone through a total of 30 lines.
 Processed 3 valid records.
 Skipped   12 invalid records.
 DONE in 0.010658 seconds of wall clock time
@@ -176,7 +176,7 @@ Here is a sample output:
 
 ```
 -----------------------------------------------------------------------------------------
-INSIGHTS DEMO TEST:
+INSIGHT'S DEMO TEST:
 PASS: ./test_1/output/repeat_donors.txt
 PASS: ./test_1/output/repeat_donors-v.txt
 PASS: ./test_1/output/repeat_donors-s.txt
