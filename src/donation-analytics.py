@@ -67,27 +67,29 @@ def main(recFilePath = './itcont.txt',
          #This is the loop where the line-by-line record inspection happens: 
          for rec in records:
              nRec += 1
-             validRecord = moldRecord(rec, nRec, selectedColumns, colID,
+             aRecord = moldRecord(rec, nRec, selectedColumns, colID,
                                       nAllColumns, logFile, logVerbose)
-             if validRecord:
-                 if isRepeat(validRecord, donors, strictRepeat):
-                     amt = validRecord.amount
-                     repeatDonations.setdefault(validRecord.groupID, []) \
+             if aRecord is not None and aRecord != 0:
+                 if isRepeat(aRecord, donors, strictRepeat):
+                     amt = aRecord.amount
+                     repeatDonations.setdefault(aRecord.groupID, []) \
                                     .append(amt)
                      # Also update and pass a running sum since recomputing
                      # the sum afresh would be an unnecessar O(nList) work.
-                     repeatSum[validRecord.groupID] = \
-                             repeatSum.setdefault(validRecord.groupID, 0) + amt
-                     emitStats(validRecord, 
-                               repeatDonations[validRecord.groupID],
-                               repeatSum[validRecord.groupID],
+                     repeatSum[aRecord.groupID] = \
+                             repeatSum.setdefault(aRecord.groupID, 0) + amt
+                     emitStats(aRecord, 
+                               repeatDonations[aRecord.groupID],
+                               repeatSum[aRecord.groupID],
                                percentile, outFile, logFile)
 
-                 if validRecord.donorID not in donors:
+                 if aRecord.donorID not in donors:
                      #Using a set() because it has O(1) look-up time.
-                     donors[validRecord.donorID] = set() 
-                 donors[validRecord.donorID].add(validRecord.year)
+                     donors[aRecord.donorID] = set() 
+                 donors[aRecord.donorID].add(aRecord.year)
                  nValid += 1
+             elif aRecord == 0: #Just a comment line, move on.
+                 continue
              else:
                  nInvalid += 1
                  continue
@@ -125,13 +127,14 @@ def findPercentileValue(sortedList,percentile):
     using the nearest-rank method.
     """
     if percentile <= 0 or percentile > 100:
-        # Percentile values out of this range will silently give wrong results.
+        # I have this check because percentile values out of this range 
+        # will silently give wrong results.
         # This check could have been done only once soon after reading in 
         # the percentile value.
         # Checking for this condition each time this function is called will
-        # make a small impact (measure how much) on overall performance.
-        # But it is safer to have it here, in case the function gets used
-        # somewhere else in the future.  
+        # make some hit on overall performance.
+        # But It it is safer to have the check contained here, in case the 
+        # function gets used somewhere else in the future.  
         raise ValueError('percentile must be greater than 0. '
                          'You gave {}'.format(percentile))
     else:    
@@ -157,28 +160,58 @@ def emitStats(record, donations, tot, percentile, outFile, logFile):
 def moldRecord(record,lineNumber,selectedColumns,colID,
               nAllColumns,logFile,logVerbose):
     """Mold a record in a datastructure and return it if it is valid."""
+    
+    #Some pre-validations before even trying isValid.
+    #See if you can gracefully move these in isValid.
+    if not record:
+       # Measure how much impact logVerbose checks have on speed.
+       # Is there a way to bypass the logVerbose check if logVerbose is False? 
+       if logVerbose:
+           msg = ('Skipping line {:<15d} ' 
+                  'because it is a blank line: {} ... \n') \
+                  .format(lineNumber, str(record))
+           logFile.write(msg)
+       return None
 
+    if record[0] and (not record[0].isspace()) and (record[0][0] == '#'):
+       if logVerbose:
+           msg = ('Skipping line {:<15d} ' 
+                  'because it is commented-out: {} ... \n') \
+                  .format(lineNumber, str(record[0]))
+           logFile.write(msg)
+       return 0 
+   
+    if len(record) != nAllColumns:
+        if logVerbose:
+            msg = ('Skipping line {:<15d} ' 
+                   'because it has some missing fields.\n') \
+                  .format(lineNumber)
+            logFile.write(msg)
+        return None
+   
     Record = namedtuple('Record', ['lineNumber', 'length', 'otherID', 
                                    'name', 'fullZipCode', 'date',  
                                    'recipient', 'amount'])
-    theRecord = Record(lineNumber = lineNumber,
-                       length     = len(record),
-                       otherID    = record[colID['OTHER_ID']],
-                       name       = record[colID['NAME']],
-                       fullZipCode= record[colID['ZIP_CODE']],
-                       date       = record[colID['TRANSACTION_DT']],
-                       recipient  = record[colID['CMTE_ID']],
-                       amount     = record[colID['TRANSACTION_AMT']])
- 
-    if isValid(nAllColumns,theRecord,logFile,logVerbose):
-        zipCode = theRecord.fullZipCode[0:5]
-        year = theRecord.date[4:8]
-        amount = int(theRecord.amount)  # Round the nearest Dollar amount.
-        donorID = theRecord.name+zipCode  # A unique donor key.
-        groupID = theRecord.recipient+zipCode+year # A unique donation group key.
+
+    checkRecord = Record(lineNumber  = lineNumber,
+                         length      = len(record),
+                         otherID     = record[colID['OTHER_ID']],
+                         name        = record[colID['NAME']],
+                         fullZipCode = record[colID['ZIP_CODE']],
+                         date        = record[colID['TRANSACTION_DT']],
+                         recipient   = record[colID['CMTE_ID']],
+                         amount      = record[colID['TRANSACTION_AMT']])
+    
+    if isValid(checkRecord, logFile, logVerbose):
+         
+        zipCode = checkRecord.fullZipCode[0:5]
+        year = checkRecord.date[4:8]
+        amount = int(checkRecord.amount)  # Round the nearest Dollar amount.
+        donorID = checkRecord.name+zipCode  # A unique donor key.
+        groupID = checkRecord.recipient+zipCode+year # A unique donation group key.
         molded = namedtuple('ValidRecord', ['donorID', 'groupID', 'recipient',
                                             'zipCode', 'amount', 'year'])
-        return molded(donorID, groupID, theRecord.recipient, 
+        return molded(donorID, groupID, checkRecord.recipient, 
                       zipCode, amount, year)
 
 def isRepeat(record, donors, strictRepeat):
@@ -209,82 +242,86 @@ def isRepeat(record, donors, strictRepeat):
     else:
         return False
 
-def isValid(nAllColumns,Record,logFile,logVerbose=False):
-    """Take a record, return True if it's valid or False otherwise"""
+def isValid(record, logFile, logVerbose=False):
+    """Take a record, return True if it's valid or False otherwise
 
+       A record is considered invalid unless it successfully percolates 
+       down through these all until else: -- and more. :/
+    """
     result = False  
-    # A record enters and remains invalid unless it passes all these tests:
-    if Record.length != nAllColumns:
-        # Measure how much impact logVerbose checks have on speed.
-        # Is there a way to bypass the logVerbose check if logVerbose is False? 
+    
+    # Consider using a try-except for all the tests below. 
+    if (len(record.otherID) != 0 and not record.otherID.isspace()):
         if logVerbose:
-            msg = ('Skipping record line {:d} ' 
-                   'because it has some missing fields.\n') \
-                  .format(Record.lineNumber)
-            logFile.write(msg)
-
-    elif Record.otherID not in (None, ''):
-        if logVerbose:
-            msg = ('Skipping record {:d} ' 
+            msg = ('Skipping line {:<15d} ' 
                    'because "OTHER_ID" field is not empty: {} \n') \
-                  .format(Record.lineNumber, Record.otherID)
+                   .format(record.lineNumber, record.otherID)
             logFile.write(msg)
 
-    elif (Record.name is None or Record.name.isspace()):
+    elif (record.recipient is None or 
+          len(record.recipient) == 0 or 
+          record.recipient.isspace() or
+          not record.recipient.isalnum()):
+        if logVerbose:
+            msg = ('Skipping line {:<15d} '
+                   'because "CMTE_ID" field is missing or empty \n') \
+                  .format(record.lineNumber)
+            logFile.write(msg)
+
+    elif (record.name is None or 
+          len(record.name) == 0 or 
+          record.name.isspace()):
         #Doing only a loose check on names on purpose.
         #If an aggressive check is needed a validator package can be used.
         if logVerbose:
-            msg = ('Skipping record {:d} ' 
+            msg = ('Skipping line {:<15d} ' 
                    'because "NAME" field is blank. \n') \
-                  .format(Record.lineNumber)
+                  .format(record.lineNumber)
             logFile.write(msg)
 
-    elif (Record.fullZipCode is None or len(Record.fullZipCode) < 5 
-          or not Record.fullZipCode[0:5].isdecimal()): 
-        #This will let in an entry like "94040-FOOBAR", which I thought is OK.
+    elif (record.fullZipCode is None or 
+          len(record.fullZipCode) < 5 or
+          not record.fullZipCode[0:5].isdecimal()): 
+        #This will let in an entry like "02895-DONTKNOW", which I thought is not not-OK.
         if logVerbose:
-            msg = ('Skipping record {:d} ' 
+            msg = ('Skipping line {:<15d} ' 
                    'because "ZIP_CODE" field does not exits, it is empty,' \
                                                       ' or malformed: {} \n') \
-                  .format(Record.lineNumber, Record.fullZipCode)
+                  .format(record.lineNumber, record.fullZipCode)
             logFile.write(msg)
 
-    elif (Record.date is None or Record.date.isspace()):
+    elif (record.date is None or 
+          len(record.date) == 0 or 
+          record.date.isspace()):
         if logVerbose:
-            msg = ('Skipping record {:d} ' 
-                   'because "TRANSACTION_DT" field is empty \
-                                                   or it does not exist. \n') \
-                  .format(Record.lineNumber)
+            msg = ('Skipping line {:<15d} ' 
+                   'because "TRANSACTION_DT" field is empty '
+                   'or it does not exist. \n') \
+                  .format(record.lineNumber)
             logFile.write(msg)
-        # Also see the final check on Record.date in else: clause below.
+        # Also see the final check on record.date in else: clause below.
 
-    elif (Record.amount is None 
-          or Record.amount.isspace()
-          or not isRealNumber(Record.amount)
-          # Non-positive contribution is no contribution
-          or int(Record.amount)<=0): 
+    elif (record.amount is None or 
+          record.amount.isspace() or
+          len(record.amount) == 0 or
+          not isRealNumber(record.amount)
+         # Non-positive contribution is no contribution
+          or int(record.amount)<=0): 
         if logVerbose:
-            msg = ('Skipping record {:d} ' 
+            msg = ('Skipping line {:<15d} ' 
                    'because "TRANSACTION_AMT" field is malformed ' 
                                                   'or non-positive: {} \n') \
-                  .format(Record.lineNumber, Record.amount)
-            logFile.write(msg)
-
-    elif Record.recipient is None or Record.recipient.isspace():
-        if logVerbose:
-            msg = ('Skipping record {:d} '
-                   'because CMTE_ID field is missing or empty \n') \
-                  .format(Record.lineNumber)
+                  .format(record.lineNumber, record.amount)
             logFile.write(msg)
 
     else:
         try:  # One more check on date to catch it if date is malformed.
-            date=datetime.datetime.strptime(Record.date, '%m%d%Y')
+            date=datetime.datetime.strptime(record.date, '%m%d%Y')
         except ValueError:
             if logVerbose:
-                msg = ('Skipping record {:d} ' 
+                msg = ('Skipping line {:<15d} ' 
                        'because "TRANSACTION_DT" field is malformed: {} \n') \
-                      .format(Record.lineNumber, Record.date)
+                      .format(record.lineNumber, record.date)
                 logFile.write(msg)
         else:
             result=True
@@ -292,14 +329,30 @@ def isValid(nAllColumns,Record,logFile,logVerbose=False):
     return result
 
 def isRealNumber(s):
-    """Return True if s (loosely) represents a real number."""
+    """Return True if s (probably) represents a real number."""
 
     try:
-        res=float(s)
-        return False if res is float('NaN') else True
+        if math.isnan(float(s)):
+            return False
+        else:
+            return True
     except ValueError:
         return False
 
+def test_isRealNumber():
+    '''Test if isRealNumber works as expected'''
+
+    fails = ['Hello', 'NaN', 'NAN', 'nan', '0e', '0.0e']
+    for anInput in fails:
+        print(anInput)
+        result = isRealNumber(anInput) 
+        assert result == False, 'FAIL: Returned {} for {}'.format(result, anInput)
+
+    passes = ['0', '0.0', '.0', '0.', '0.0e0', '0e0']
+    for anInput in passes:
+        result = isRealNumber(anInput) 
+        assert result == True, 'FAIL: Returned {} for {}'.format(result, anInput)
+     
 if __name__ == '__main__':
     """Command-line execution for donation-analytics.py"""
 
@@ -333,3 +386,5 @@ if __name__ == '__main__':
     dtWall = main(recFilePath, pctFilePath, outFilePath, logFilePath,
                   logVerbose, strictRepeat)
     print('DONE in {0:10g} seconds of wall clock time'.format(dtWall))
+
+    test_isRealNumber()
