@@ -65,7 +65,8 @@ impact on overall run time because
 
 As shown in [Performance and Scalability](Readme.md#performance-and-scalability) all these 
 considerations made the per-record time complexity about O(1) time, making the overall run time 
-comlexity about O(n) where n is the number of records in the file. 
+comlexity about O(n) where n is the number of records in the file. Since each record must be examined
+this scaling is as good as it gets for this problem.
 
 Footnotes:
 
@@ -97,18 +98,18 @@ donor donates -- a subsequent donation to *any* recipent qualifies as a repeat d
 ## Performance and Scalability
 Since my implementation does almost a constant-time (O(1)) work per each record, the overall
 run time per n records should scale linarly (O(n)). 
-This plot demonstrates that my apprach does scale-up linearly up to reasonably large numbers of 
-records.
+This plot demonstrates that my approach indeed scales up linearly.
 I generated this data by running my script for the first n = 1, 10, 100, 1k, 10k, 100k, 1M and 10M
 records grabbed from the `itcont.txt` file provided in FEC web site for the year 2016. 
 My algorithm and implementation scales up nearly linearly to at least 10M records.
 Note that the complete year-2016 file, which is the largest one provided, has slighly more than 20M 
-records, which can be processed in about 4 hours according to this scaling.
+records, which can be processed in about 3:30 hours according to this scaling.
 
 ![Performance and Scalability](./scaleUp.png)
 
 [Back to Table of contents](README.md#table-of-contents)
 
+Since each record must be examined this scaling is as good as it gets for this problem.
 
 ## Extra Features
 
