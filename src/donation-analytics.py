@@ -344,7 +344,6 @@ def test_isRealNumber():
 
     fails = ['Hello', 'NaN', 'NAN', 'nan', '0e', '0.0e']
     for anInput in fails:
-        print(anInput)
         result = isRealNumber(anInput) 
         assert result == False, 'FAIL: Returned {} for {}'.format(result, anInput)
 
